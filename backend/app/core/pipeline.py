@@ -159,17 +159,31 @@ class Pipeline:
             )
             
             # Step 7: 输出
+            logger.info(f"Configured outputs: {settings.outputs}")
+            
             if "notion" in settings.outputs:
+                logger.info("Delivering to Notion...")
                 await self._deliver_to_notion(digest, run_id)
+            else:
+                logger.debug("Notion output not enabled")
             
             if "markdown" in settings.outputs:
+                logger.info("Delivering to Markdown...")
                 await self._deliver_to_markdown(digest, run_id)
+            else:
+                logger.debug("Markdown output not enabled")
             
             if "telegram" in settings.outputs:
+                logger.info("Delivering to Telegram...")
                 await self._deliver_to_telegram(digest, run_id)
+            else:
+                logger.debug("Telegram output not enabled (not in OUTPUTS or not configured)")
             
             if "email" in settings.outputs:
+                logger.info("Delivering to Email...")
                 await self._deliver_to_email(digest, run_id)
+            else:
+                logger.debug("Email output not enabled (not in OUTPUTS or not configured)")
             
             # 更新 Pipeline Run 状态
             await self._update_pipeline_run(run_id, "success")

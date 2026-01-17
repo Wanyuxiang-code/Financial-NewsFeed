@@ -23,6 +23,7 @@ notion-client>=2.2.1
 # Rate Limiting & Async
 aiolimiter>=1.1.0
 tenacity>=8.2.3
+aiohttp>=3.9.0
 
 # Utilities
 python-dateutil>=2.8.2

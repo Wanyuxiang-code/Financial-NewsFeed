@@ -2,7 +2,12 @@
 import asyncio
 from typing import Optional
 from datetime import datetime
-import aiohttp
+
+try:
+    import aiohttp
+    AIOHTTP_AVAILABLE = True
+except ImportError:
+    AIOHTTP_AVAILABLE = False
 
 from app.outputs.base import BaseOutput, Digest, DigestItem
 from app.config import settings
@@ -34,6 +39,9 @@ class TelegramOutput(BaseOutput):
         bot_token: Optional[str] = None,
         chat_id: Optional[str] = None
     ):
+        if not AIOHTTP_AVAILABLE:
+            raise ImportError("aiohttp not installed. Run: pip install aiohttp")
+        
         self.bot_token = bot_token or settings.telegram_bot_token
         self.chat_id = chat_id or settings.telegram_chat_id
         
