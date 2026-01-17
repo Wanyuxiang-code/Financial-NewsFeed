@@ -245,8 +245,12 @@ class Pipeline:
         # 获取 AI Provider
         try:
             provider = get_ai_provider()
+            logger.info(f"AI provider created: {provider.provider_name} / {provider.model_name}")
         except Exception as e:
+            import traceback
             logger.error(f"Failed to create AI provider: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.warning("⚠️ Continuing without AI analysis - all news will be marked as neutral")
             # 没有 AI，仍然保存新闻但不分析
             async with async_session_maker() as db:
                 for raw_create, news_create in normalized_items:
@@ -264,20 +268,24 @@ class Pipeline:
             return digest_items
         
         # 有 AI，进行分析
-        logger.info(f"Starting AI analysis for {len(normalized_items)} items")
+        logger.info(f"🚀 Starting AI analysis for {len(normalized_items)} items with {provider.provider_name}")
+        analyzed_count = 0
+        skipped_count = 0
+        
         try:
             async with provider:
                 async with async_session_maker() as db:
                     for i, (raw_create, news_create) in enumerate(normalized_items):
-                        logger.info(f"Processing item {i+1}/{len(normalized_items)}: {news_create.title[:40]}")
+                        logger.info(f"[{i+1}/{len(normalized_items)}] Processing: {news_create.title[:50]}")
                         
                         # 检查是否已存在（URL 或 Hash 去重）
                         existing = await crud.get_news_item_by_url(db, news_create.canonical_url)
                         if existing:
-                            logger.info(f"Skipping duplicate item {i+1}")
+                            logger.info(f"[{i+1}] ⏭️ Skipping duplicate (URL already in DB)")
+                            skipped_count += 1
                             continue
                         
-                        logger.info(f"Analyzing item {i+1}...")
+                        logger.info(f"[{i+1}] 🔍 Calling AI for analysis...")
                         
                         # 保存原始数据
                         raw_item = await crud.create_raw_item(db, raw_create)
@@ -323,16 +331,25 @@ class Pipeline:
                             
                             analysis = analysis_output
                             self.stats["analyzed_success"] += 1
+                            analyzed_count += 1
+                            logger.info(f"[{i+1}] ✅ Analysis success: {analysis_output.impact_direction} ({analysis_output.event_type})")
                             
                         except Exception as e:
-                            logger.warning(f"Analysis failed for {news_create.title[:50]}: {type(e).__name__}: {e}")
+                            import traceback
+                            logger.warning(f"[{i+1}] ❌ Analysis failed: {type(e).__name__}: {e}")
+                            logger.debug(f"Traceback: {traceback.format_exc()}")
                             self.stats["analyzed_failed"] += 1
                         
                         digest_items.append(DigestItem(news=news_create, analysis=analysis))
                     
                     await db.commit()
+                    
+            logger.info(f"📊 Analysis complete: {analyzed_count} success, {self.stats['analyzed_failed']} failed, {skipped_count} skipped")
+            
         except Exception as e:
+            import traceback
             logger.error(f"Error during AI analysis: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             raise
         
         return digest_items

@@ -62,15 +62,41 @@ jobs:
           ls -la backend/data/
           ls -la backend/data/prompts/
 
+      - name: Verify secrets
+        run: |
+          echo "=== Verifying Secrets ==="
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "❌ ERROR: GEMINI_API_KEY is empty!"
+            echo "Please set the GEMINI_API_KEY secret in GitHub repository settings."
+            exit 1
+          else
+            echo "✅ GEMINI_API_KEY is set (length: ${#GEMINI_API_KEY})"
+          fi
+          if [ -z "$FINNHUB_API_KEY" ]; then
+            echo "⚠️ WARNING: FINNHUB_API_KEY is empty"
+          else
+            echo "✅ FINNHUB_API_KEY is set (length: ${#FINNHUB_API_KEY})"
+          fi
+
       - name: Run daily digest pipeline
         run: |
           cd backend
+          echo "=== Environment Check ==="
+          python -c "
+          from app.config import settings
+          print(f'AI Provider: {settings.ai_provider}')
+          print(f'Gemini Model: {settings.gemini_model}')
+          print(f'Gemini API Key set: {bool(settings.gemini_api_key)}')
+          print(f'Gemini API Key length: {len(settings.gemini_api_key) if settings.gemini_api_key else 0}')
+          print(f'Outputs: {settings.outputs}')
+          "
+          echo ""
           echo "=== Running pipeline ==="
           python -m app.cli --hours 24 --limit 5 --debug 2>&1 | tee pipeline.log
           echo ""
           echo "=== Pipeline completed ==="
           echo "Analysis results:"
-          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED|KeyError|Error)" pipeline.log || echo "No matching patterns found"
+          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED|KeyError|Error|AI provider|GeminiProvider)" pipeline.log || echo "No matching patterns found"
 
       - name: Upload digest as artifact
         uses: actions/upload-artifact@v4
