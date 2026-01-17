@@ -15,9 +15,12 @@ jobs:
     env:
       FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
-      AI_PROVIDER: gemini
+      # 切换 AI Provider: gemini 或 openai
+      AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'gemini' }}
       GEMINI_MODEL: gemini-2.0-flash
+      OPENAI_MODEL: gpt-4o-mini
       OUTPUTS: markdown
       WATCHLIST_PATH: data/watchlist.yaml
       PROMPTS_DIR: data/prompts
@@ -43,14 +46,18 @@ jobs:
           cd backend
           echo "FINNHUB_API_KEY=$FINNHUB_API_KEY" > .env
           echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+          echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
           echo "SEC_USER_AGENT=$SEC_USER_AGENT" >> .env
           echo "AI_PROVIDER=$AI_PROVIDER" >> .env
           echo "GEMINI_MODEL=$GEMINI_MODEL" >> .env
+          echo "OPENAI_MODEL=$OPENAI_MODEL" >> .env
           echo "OUTPUTS=$OUTPUTS" >> .env
           echo "WATCHLIST_PATH=$WATCHLIST_PATH" >> .env
           echo "PROMPTS_DIR=$PROMPTS_DIR" >> .env
           echo "=== .env file created ==="
+          echo "AI_PROVIDER: $AI_PROVIDER"
           echo "GEMINI_API_KEY length: ${#GEMINI_API_KEY}"
+          echo "OPENAI_API_KEY length: ${#OPENAI_API_KEY}"
           echo "FINNHUB_API_KEY length: ${#FINNHUB_API_KEY}"
 
       - name: Copy data files
