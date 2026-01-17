@@ -31,7 +31,7 @@ jobs:
       - name: Create .env file
         run: |
           cd backend
-          cat > .env << EOF
+          cat > .env << 'EOF'
           FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
           SEC_USER_AGENT=${{ secrets.SEC_USER_AGENT }}
@@ -41,6 +41,10 @@ jobs:
           WATCHLIST_PATH=data/watchlist.yaml
           PROMPTS_DIR=data/prompts
           EOF
+          # Remove leading spaces from .env
+          sed -i 's/^[[:space:]]*//' .env
+          echo "=== .env contents ==="
+          cat .env
 
       - name: Copy data files
         run: |
@@ -50,7 +54,11 @@ jobs:
       - name: Run daily digest pipeline
         run: |
           cd backend
-          python -m app.cli --hours 24 --limit 5
+          echo "=== Running pipeline ==="
+          python -m app.cli --hours 24 --limit 5 --debug 2>&1 | tee pipeline.log
+          echo "=== Pipeline completed ==="
+          # Show analysis results
+          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED)" pipeline.log || true
 
       - name: Upload digest as artifact
         uses: actions/upload-artifact@v4
