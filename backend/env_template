@@ -42,7 +42,8 @@ SEC_ENABLED=true
 SEC_USER_AGENT=NewsFeed/1.0 (your_email@example.com)
 
 # ===== 输出配置 =====
-# 逗号分隔: markdown,notion,email,telegram
+# 逗号分隔，可同时启用多个: markdown,telegram,email,notion
+# 示例: OUTPUTS=markdown,telegram,email
 OUTPUTS=markdown
 
 # --- Notion ---

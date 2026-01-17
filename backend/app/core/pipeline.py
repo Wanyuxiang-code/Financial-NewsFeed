@@ -24,6 +24,8 @@ from app.providers.base import AIAnalysisError
 from app.outputs.base import Digest, DigestItem, TickerSummary
 from app.outputs.notion import NotionOutput
 from app.outputs.markdown import MarkdownOutput
+from app.outputs.telegram import TelegramOutput
+from app.outputs.email import EmailOutput
 from app.utils.logger import get_logger, set_run_id, get_run_id
 
 logger = get_logger(__name__)
@@ -162,6 +164,12 @@ class Pipeline:
             
             if "markdown" in settings.outputs:
                 await self._deliver_to_markdown(digest, run_id)
+            
+            if "telegram" in settings.outputs:
+                await self._deliver_to_telegram(digest, run_id)
+            
+            if "email" in settings.outputs:
+                await self._deliver_to_email(digest, run_id)
             
             # 更新 Pipeline Run 状态
             await self._update_pipeline_run(run_id, "success")
@@ -419,6 +427,32 @@ class Pipeline:
             
         except Exception as e:
             logger.error(f"Markdown delivery failed: {e}")
+    
+    async def _deliver_to_telegram(self, digest: Digest, run_id: UUID):
+        """推送到 Telegram"""
+        try:
+            async with TelegramOutput() as output:
+                success = await output.deliver(digest)
+            
+            if success:
+                self.stats["delivered"] += 1
+                logger.info("Delivered to Telegram")
+            
+        except Exception as e:
+            logger.error(f"Telegram delivery failed: {e}")
+    
+    async def _deliver_to_email(self, digest: Digest, run_id: UUID):
+        """发送邮件"""
+        try:
+            async with EmailOutput() as output:
+                success = await output.deliver(digest)
+            
+            if success:
+                self.stats["delivered"] += 1
+                logger.info("Delivered to Email")
+            
+        except Exception as e:
+            logger.error(f"Email delivery failed: {e}")
     
     async def _generate_ticker_summaries(
         self,
