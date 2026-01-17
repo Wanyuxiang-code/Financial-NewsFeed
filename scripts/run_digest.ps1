@@ -8,7 +8,8 @@
 param(
     [int]$Hours = 24,
     [string]$Tickers = "",
-    [int]$Limit = 5  # 每只股票最多分析 5 条新闻
+    [int]$Limit = 5,  # 每只股票最多分析 5 条新闻
+    [switch]$AutoOpen = $true  # 生成后自动打开报告
 )
 
 $ErrorActionPreference = "Stop"
@@ -71,6 +72,13 @@ try {
     if ($LatestDigest) {
         Write-Host ""
         Write-Host "Latest digest: $($LatestDigest.FullName)" -ForegroundColor Cyan
+        
+        # 自动打开报告
+        if ($AutoOpen) {
+            Write-Host ""
+            Write-Host "Opening report..." -ForegroundColor Yellow
+            Start-Process $LatestDigest.FullName
+        }
     }
     
 } catch {

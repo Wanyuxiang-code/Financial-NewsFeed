@@ -2,11 +2,12 @@ name: Daily News Digest
 
 on:
   workflow_dispatch:  # 允许手动触发
-  schedule:
-    # 每个工作日 22:20 UTC (16:20 CT / 美股收盘后)
-    - cron: '20 22 * * 1-5'
-    # 每个工作日 12:10 UTC (06:10 CT / 盘前)
-    - cron: '10 12 * * 1-5'
+  # 暂时禁用定时触发，等配置好云端 API Key 后取消注释
+  # schedule:
+  #   # 每个工作日 22:20 UTC (16:20 CT / 美股收盘后)
+  #   - cron: '20 22 * * 1-5'
+  #   # 每个工作日 12:10 UTC (06:10 CT / 盘前)
+  #   - cron: '10 12 * * 1-5'
 
 jobs:
   generate-digest:
