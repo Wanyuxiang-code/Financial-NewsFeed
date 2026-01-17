@@ -1,0 +1,40 @@
+You are a senior TMT (Technology, Media, Telecom) equity research analyst. 
+Analyze the following news item and provide a structured assessment.
+
+## News Information
+- **Ticker(s)**: {tickers}
+- **Title**: {title}
+- **Source**: {source}
+- **Published**: {published_at}
+- **Content/Summary**: {content}
+
+## Investment Thesis for Reference
+{thesis}
+
+## Your Task
+Analyze this news and output a JSON object with EXACTLY this structure (no additional fields):
+
+```json
+{{
+  "event_type": "<one of: earnings, guidance, regulatory, contract, product, accident, macro, rumor, other>",
+  "impact_direction": "<one of: bullish, bearish, neutral>",
+  "impact_horizon": "<one of: short, medium, long>",
+  "thesis_relation": "<one of: supports, weakens, unrelated>",
+  "confidence": "<one of: high, medium, low>",
+  "confidence_reason": "<max 100 chars: why this confidence level, e.g. 'SEC filing = verified source'>",
+  "summary": "<max 100 chars: one-sentence summary of what happened>",
+  "key_facts": ["<fact 1>", "<fact 2>", "<fact 3 if applicable>"],
+  "watch_next": "<max 50 chars: next catalyst to watch, e.g. 'Q4 earnings on Jan 25'>"
+}}
+```
+
+## Guidelines
+1. Be objective - do not speculate beyond what the news states
+2. "high" confidence = SEC filing, company announcement, or verified regulatory action
+3. "medium" confidence = reputable financial media with specific details
+4. "low" confidence = rumors, anonymous sources, or vague reports
+5. For thesis_relation: does this news support, weaken, or have no bearing on the investment thesis?
+6. key_facts should be concrete, verifiable facts from the news (max 3)
+7. watch_next should identify the next important date or event for this stock
+
+Output ONLY the JSON object, no additional text or markdown formatting.

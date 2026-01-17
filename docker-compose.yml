@@ -1,0 +1,65 @@
+# NewsFeed Docker Compose Configuration
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: newsfeed-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount data directory for persistence
+      - ./data:/app/data
+      # Mount for development (optional)
+      # - ./backend/app:/app/app
+    environment:
+      # Database
+      - DATABASE_URL=sqlite+aiosqlite:///./data/newsfeed.db
+      
+      # AI Provider (choose one)
+      - AI_PROVIDER=${AI_PROVIDER:-gemini}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      
+      # Data Sources
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY}
+      - FINNHUB_ENABLED=${FINNHUB_ENABLED:-true}
+      - SEC_ENABLED=${SEC_ENABLED:-true}
+      - SEC_USER_AGENT=${SEC_USER_AGENT:-NewsFeed/1.0 (docker)}
+      
+      # Outputs
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      - NOTION_DATABASE_ID=${NOTION_DATABASE_ID}
+      
+      # Debug
+      - DEBUG=${DEBUG:-false}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: PostgreSQL for production
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: newsfeed-db
+  #   environment:
+  #     POSTGRES_USER: newsfeed
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+  #     POSTGRES_DB: newsfeed
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U newsfeed"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# volumes:
+#   postgres_data:

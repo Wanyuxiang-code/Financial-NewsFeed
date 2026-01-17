@@ -1,0 +1,78 @@
+name: Daily News Digest
+
+on:
+  workflow_dispatch:  # 允许手动触发
+  schedule:
+    # 每个工作日 22:20 UTC (16:20 CT / 美股收盘后)
+    - cron: '20 22 * * 1-5'
+    # 每个工作日 12:10 UTC (06:10 CT / 盘前)
+    - cron: '10 12 * * 1-5'
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Create .env file
+        run: |
+          cd backend
+          cat > .env << EOF
+          FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          SEC_USER_AGENT=${{ secrets.SEC_USER_AGENT }}
+          AI_PROVIDER=gemini
+          GEMINI_MODEL=gemini-2.0-flash
+          OUTPUTS=markdown
+          WATCHLIST_PATH=data/watchlist.yaml
+          PROMPTS_DIR=data/prompts
+          EOF
+
+      - name: Copy data files
+        run: |
+          cp data/watchlist.yaml backend/data/watchlist.yaml
+          cp -r data/prompts/* backend/data/prompts/
+
+      - name: Run daily digest pipeline
+        run: |
+          cd backend
+          python -m app.cli --hours 24 --limit 5
+
+      - name: Upload digest as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-digest-${{ github.run_number }}
+          path: |
+            backend/data/digests/*.md
+            backend/data/digests/charts/*.png
+          retention-days: 30
+
+      - name: Get digest filename
+        id: digest
+        run: |
+          DIGEST_FILE=$(ls -t backend/data/digests/*.md | head -1)
+          echo "file=$DIGEST_FILE" >> $GITHUB_OUTPUT
+          echo "Generated: $DIGEST_FILE"
+
+      - name: Create summary
+        run: |
+          echo "## 📰 Daily Digest Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the digest from **Artifacts** above." >> $GITHUB_STEP_SUMMARY

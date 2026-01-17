@@ -1,0 +1,413 @@
+# NewsFeed Watchlist Configuration
+# 添加你关注的股票及其投资论点（含板块温度计ETF，可选）
+# 新增字段：
+# - keywords: 关键词列表（用于抓取/聚合/优先级加权）
+
+watchlist:
+  # ===== AI 基础设施：算力/代工 =====
+  - ticker: NVDA
+    company_name: NVIDIA Corporation
+    thesis: "AI 芯片与系统平台领导者；数据中心GPU+生态护城河（CUDA/NVLink）；关注CoWoS/先进封装/HBM等供给瓶颈与capex周期"
+    risk_tags:
+      - "对华出口限制与合规不确定"
+      - "云厂商capex周期波动"
+      - "竞争加剧（AMD/自研ASIC）"
+      - "估值波动与预期过高"
+    priority: 1
+    sector: AI Infrastructure
+    keywords:
+      - "Rubin"
+      - "Blackwell"
+      - "Hopper"
+      - "CUDA"
+      - "NVLink"
+      - "InfiniBand"
+      - "Spectrum-X"
+      - "HGX"
+      - "DGX"
+      - "Grace"
+      - "HBM"
+      - "HBM3E"
+      - "HBM4"
+      - "CoWoS"
+      - "advanced packaging"
+      - "TSMC"
+      - "data center"
+      - "hyperscaler capex"
+      - "export controls"
+      - "China"
+
+  - ticker: TSM
+    company_name: Taiwan Semiconductor Manufacturing
+    thesis: "先进制程与先进封装核心供给方；AI 芯片需求与封装产能扩张驱动；卖铲人属性强"
+    risk_tags:
+      - "地缘政治风险"
+      - "资本开支上行带来的周期波动"
+      - "先进封装扩产不及预期"
+    priority: 1
+    sector: Semiconductors
+    keywords:
+      - "N3"
+      - "N2"
+      - "A16"
+      - "GAA"
+      - "EUV"
+      - "CoWoS"
+      - "SoIC"
+      - "InFO"
+      - "advanced packaging"
+      - "wafer fab"
+      - "capex"
+      - "foundry"
+      - "HPC"
+      - "AI demand"
+      - "Apple"
+      - "NVIDIA"
+      - "AMD"
+
+  - ticker: AMD
+    company_name: Advanced Micro Devices
+    thesis: "AI 加速卡与数据中心CPU双线；MI3xx系放量与软件生态（ROCm）进展是关键变量"
+    risk_tags:
+      - "客户导入/供给节奏不确定"
+      - "软件生态与开发者黏性弱于对手"
+      - "价格竞争导致毛利承压"
+    priority: 2
+    sector: AI Infrastructure
+    keywords:
+      - "MI300"
+      - "MI300X"
+      - "MI300A"
+      - "MI325"
+      - "Instinct"
+      - "ROCm"
+      - "EPYC"
+      - "Genoa"
+      - "Bergamo"
+      - "Turin"
+      - "Infinity Fabric"
+      - "HBM"
+      - "TSMC"
+      - "hyperscaler"
+      - "AI accelerator"
+      - "data center GPU"
+      - "OpenAI"
+      - "Microsoft"
+
+  - ticker: INTC
+    company_name: Intel Corporation
+    thesis: "转型与修复标的：先进工艺与Foundry推进、外部客户导入是主要看点（更偏‘期权型’）"
+    risk_tags:
+      - "制程/良率与里程碑延期"
+      - "资本开支与现金流压力"
+      - "市场份额继续流失"
+    priority: 4
+    sector: Semiconductors
+    keywords:
+      - "18A"
+      - "20A"
+      - "Intel Foundry"
+      - "IFS"
+      - "RibbonFET"
+      - "PowerVia"
+      - "EUV"
+      - "foundry customers"
+      - "Gaudi"
+      - "Gaudi 3"
+      - "Xeon"
+      - "Granite Rapids"
+      - "Sierra Forest"
+      - "packaging"
+      - "EMIB"
+      - "Foveros"
+      - "CHIPS Act"
+
+  # ===== AI 基础设施：互连/网络（买瓶颈） =====
+  - ticker: AVGO
+    company_name: Broadcom Inc.
+    thesis: "AI 数据中心网络与交换芯片龙头；CPO/以太网扩容受益；受超大规模客户capex驱动"
+    risk_tags:
+      - "大客户集中度高"
+      - "capex周期与订单波动"
+      - "估值偏高时回撤风险"
+    priority: 2
+    sector: AI Networking
+    keywords:
+      - "Tomahawk"
+      - "Tomahawk 5"
+      - "Tomahawk 6"
+      - "Jericho"
+      - "Trident"
+      - "CPO"
+      - "co-packaged optics"
+      - "Ethernet"
+      - "AI networking"
+      - "switch silicon"
+      - "SerDes"
+      - "PCIe"
+      - "hyperscaler"
+      - "Meta"
+      - "Google"
+      - "custom ASIC"
+      - "VMware"
+
+  - ticker: MRVL
+    company_name: Marvell Technology
+    thesis: "数据中心互连关键芯片（DSP/SerDes等）；随800G/1.6T光互连升级与AI集群扩张受益"
+    risk_tags:
+      - "产品导入节奏不确定"
+      - "竞争加剧与价格压力"
+      - "客户集中度与订单波动"
+    priority: 3
+    sector: AI Networking
+    keywords:
+      - "DSP"
+      - "optical DSP"
+      - "Nova"
+      - "1.6T"
+      - "800G"
+      - "400G"
+      - "PAM4"
+      - "coherent"
+      - "SerDes"
+      - "electro-optics"
+      - "data center interconnect"
+      - "CPO"
+      - "switch"
+      - "hyperscaler"
+
+  # ===== AI 基础设施：供电/散热 =====
+  - ticker: MOD
+    company_name: Modine Manufacturing Company
+    thesis: "数据中心热管理/液冷相关增量受益；相对‘性价比’的AI基建补充配置"
+    risk_tags:
+      - "扩产与交付执行风险"
+      - "capex放缓导致需求回落"
+      - "非纯AI业务带来波动"
+    priority: 4
+    sector: Data Center Infrastructure
+    keywords:
+      - "liquid cooling"
+      - "CDU"
+      - "cooling distribution unit"
+      - "data center cooling"
+      - "thermal management"
+      - "rack density"
+      - "immersion cooling"
+      - "capacity expansion"
+      - "orders backlog"
+
+  - ticker: VRT
+    company_name: Vertiv Holdings Co
+    thesis: "数据中心电力与热管理龙头；液冷/高功率密度机柜趋势受益（估值敏感）"
+    risk_tags:
+      - "估值偏高导致波动"
+      - "订单与交付周期波动"
+      - "capex放缓风险"
+    priority: 5
+    sector: Data Center Infrastructure
+    keywords:
+      - "power management"
+      - "UPS"
+      - "thermal management"
+      - "liquid cooling"
+      - "CDU"
+      - "data center"
+      - "rack density"
+      - "backlog"
+      - "hyperscaler"
+
+  # ===== 存储：HBM/DRAM + 冷存储/HDD =====
+  - ticker: MU
+    company_name: Micron Technology
+    thesis: "HBM/高端内存受AI服务器带动；结构性成长叠加周期属性（价格/库存/供给）"
+    risk_tags:
+      - "周期性行业（DRAM/NAND价格）"
+      - "HBM竞争（SK hynix/Samsung）"
+      - "capex扩张带来供给反噬"
+    priority: 2
+    sector: Memory
+    keywords:
+      - "HBM"
+      - "HBM3E"
+      - "HBM4"
+      - "DRAM"
+      - "NAND"
+      - "server DRAM"
+      - "AI servers"
+      - "bit demand"
+      - "ASP"
+      - "inventory"
+      - "capex"
+      - "TSMC"
+      - "packaging"
+      - "yield"
+      - "CHIPS Act"
+
+  - ticker: WDC
+    company_name: Western Digital Corporation
+    thesis: "分拆后更偏‘近线HDD冷存储’逻辑：AI数据湖/归档需求+$/TB优势；关注HAMR路线与云厂订单"
+    risk_tags:
+      - "HDD行业周期波动"
+      - "云厂capex与订单节奏"
+      - "HAMR量产/爬坡不及预期"
+    priority: 3
+    sector: Storage
+    keywords:
+      - "HDD"
+      - "nearline"
+      - "cloud storage"
+      - "HAMR"
+      - "heat-assisted magnetic recording"
+      - "capacity (TB)"
+      - "hyperscaler"
+      - "data lake"
+      - "archival"
+      - "TCO"
+      - "enterprise storage"
+      - "Seagate"
+
+  - ticker: SNDK
+    company_name: SanDisk Corporation
+    thesis: "NAND/企业级SSD链条暴露更纯；适合战术跟踪（高波动）"
+    risk_tags:
+      - "NAND价格周期剧烈"
+      - "估值泡沫与情绪回撤"
+      - "capex放缓引发需求预期下修"
+    priority: 5
+    sector: Storage
+    keywords:
+      - "NAND"
+      - "eSSD"
+      - "enterprise SSD"
+      - "QLC"
+      - "TLC"
+      - "controller"
+      - "PCIe 5.0"
+      - "Gen5 SSD"
+      - "pricing"
+      - "inventory"
+      - "hyperscaler"
+
+  # ===== 云计算 / 科技巨头 =====
+  - ticker: GOOGL
+    company_name: Alphabet Inc.
+    thesis: "搜索+YouTube现金流底座；Cloud+AI（Gemini）增量；关注反垄断补救措施与AI搜索范式变化"
+    risk_tags:
+      - "反垄断诉讼与补救措施不确定"
+      - "AI对搜索变现的潜在冲击"
+      - "capex上行压制自由现金流"
+    priority: 1
+    sector: Big Tech
+    keywords:
+      - "Gemini"
+      - "AI Overviews"
+      - "Search"
+      - "YouTube"
+      - "Google Cloud"
+      - "GCP"
+      - "Vertex AI"
+      - "TPU"
+      - "Waymo"
+      - "TAC"
+      - "ad tech"
+      - "AdX"
+      - "Google Ad Manager"
+      - "DOJ"
+      - "antitrust"
+      - "Chrome"
+      - "privacy sandbox"
+
+  - ticker: MSFT
+    company_name: Microsoft Corporation
+    thesis: "Azure 云增长+AI商业化（Copilot/模型服务）；企业软件生态强，关注AI ROI兑现"
+    risk_tags:
+      - "云增速放缓"
+      - "AI投资回报与capex压力"
+      - "合作生态不确定性"
+    priority: 3
+    sector: Big Tech
+    keywords:
+      - "Azure"
+      - "Copilot"
+      - "Microsoft 365"
+      - "OpenAI"
+      - "AI services"
+      - "capex"
+      - "data center"
+      - "AI infrastructure"
+      - "ARR"
+      - "security"
+      - "Activision"
+
+  # ===== 航天 =====
+  - ticker: RKLB
+    company_name: Rocket Lab USA
+    thesis: "商业航天高β：Neutron里程碑+空间系统业务订单；关注合同兑现与现金流拐点"
+    risk_tags:
+      - "研发/进度延期风险（Neutron）"
+      - "发射事故/可靠性风险"
+      - "政府预算/订单节奏波动"
+      - "融资稀释风险"
+    priority: 2
+    sector: Space
+    keywords:
+      - "Neutron"
+      - "Electron"
+      - "launch"
+      - "reusability"
+      - "Wallops"
+      - "SDA"
+      - "Space Development Agency"
+      - "National Security Space"
+      - "space systems"
+      - "satellite manufacturing"
+      - "backlog"
+      - "contract award"
+      - "FAA"
+      - "anomaly"
+
+  # ===== （可选）板块温度计 ETF：用于宏观/行业热度与对照基准 =====
+  - ticker: SOXX
+    company_name: iShares Semiconductor ETF
+    thesis: "半导体板块温度计；用于对照单股超额收益与行业beta"
+    risk_tags:
+      - "行业周期波动"
+    priority: 5
+    sector: ETF
+    keywords:
+      - "semiconductor index"
+      - "SOX"
+      - "earnings"
+      - "capex"
+      - "inventory"
+      - "foundry"
+      - "AI chips"
+
+  - ticker: QQQM
+    company_name: Invesco NASDAQ 100 ETF
+    thesis: "纳指100温度计；用于观察大盘成长风格与科技估值环境"
+    risk_tags:
+      - "风格切换/利率冲击"
+    priority: 5
+    sector: ETF
+    keywords:
+      - "Nasdaq 100"
+      - "megacap"
+      - "growth stocks"
+      - "rates"
+      - "tech valuation"
+
+  - ticker: VOO
+    company_name: Vanguard S&P 500 ETF
+    thesis: "标普500基准；用于观察大盘beta与风险偏好"
+    risk_tags:
+      - "宏观风险"
+    priority: 5
+    sector: ETF
+    keywords:
+      - "S&P 500"
+      - "risk-on"
+      - "rates"
+      - "earnings season"
+      - "macro"
