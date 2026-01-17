@@ -12,6 +12,16 @@ jobs:
   generate-digest:
     runs-on: ubuntu-latest
     
+    env:
+      FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+      AI_PROVIDER: gemini
+      GEMINI_MODEL: gemini-2.0-flash
+      OUTPUTS: markdown
+      WATCHLIST_PATH: data/watchlist.yaml
+      PROMPTS_DIR: data/prompts
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,34 +41,36 @@ jobs:
       - name: Create .env file
         run: |
           cd backend
-          cat > .env << 'EOF'
-          FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          SEC_USER_AGENT=${{ secrets.SEC_USER_AGENT }}
-          AI_PROVIDER=gemini
-          GEMINI_MODEL=gemini-2.0-flash
-          OUTPUTS=markdown
-          WATCHLIST_PATH=data/watchlist.yaml
-          PROMPTS_DIR=data/prompts
-          EOF
-          # Remove leading spaces from .env
-          sed -i 's/^[[:space:]]*//' .env
-          echo "=== .env contents ==="
-          cat .env
+          echo "FINNHUB_API_KEY=$FINNHUB_API_KEY" > .env
+          echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+          echo "SEC_USER_AGENT=$SEC_USER_AGENT" >> .env
+          echo "AI_PROVIDER=$AI_PROVIDER" >> .env
+          echo "GEMINI_MODEL=$GEMINI_MODEL" >> .env
+          echo "OUTPUTS=$OUTPUTS" >> .env
+          echo "WATCHLIST_PATH=$WATCHLIST_PATH" >> .env
+          echo "PROMPTS_DIR=$PROMPTS_DIR" >> .env
+          echo "=== .env file created ==="
+          echo "GEMINI_API_KEY length: ${#GEMINI_API_KEY}"
+          echo "FINNHUB_API_KEY length: ${#FINNHUB_API_KEY}"
 
       - name: Copy data files
         run: |
+          mkdir -p backend/data/prompts
           cp data/watchlist.yaml backend/data/watchlist.yaml
           cp -r data/prompts/* backend/data/prompts/
+          echo "=== Data files copied ==="
+          ls -la backend/data/
+          ls -la backend/data/prompts/
 
       - name: Run daily digest pipeline
         run: |
           cd backend
           echo "=== Running pipeline ==="
           python -m app.cli --hours 24 --limit 5 --debug 2>&1 | tee pipeline.log
+          echo ""
           echo "=== Pipeline completed ==="
-          # Show analysis results
-          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED)" pipeline.log || true
+          echo "Analysis results:"
+          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED|KeyError|Error)" pipeline.log || echo "No matching patterns found"
 
       - name: Upload digest as artifact
         uses: actions/upload-artifact@v4
@@ -67,14 +79,8 @@ jobs:
           path: |
             backend/data/digests/*.md
             backend/data/digests/charts/*.png
+            backend/pipeline.log
           retention-days: 30
-
-      - name: Get digest filename
-        id: digest
-        run: |
-          DIGEST_FILE=$(ls -t backend/data/digests/*.md | head -1)
-          echo "file=$DIGEST_FILE" >> $GITHUB_OUTPUT
-          echo "Generated: $DIGEST_FILE"
 
       - name: Create summary
         run: |
@@ -82,5 +88,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Run:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "**Time:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Analysis Stats" >> $GITHUB_STEP_SUMMARY
+          grep -E "Analyzed:" backend/pipeline.log >> $GITHUB_STEP_SUMMARY || echo "Stats not found" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Download the digest from **Artifacts** above." >> $GITHUB_STEP_SUMMARY
