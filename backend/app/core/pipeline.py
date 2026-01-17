@@ -243,14 +243,25 @@ class Pipeline:
         digest_items: List[DigestItem] = []
         
         # 获取 AI Provider
+        logger.info("=" * 50)
+        logger.info("🤖 STEP: Creating AI Provider")
+        logger.info("=" * 50)
         try:
+            from app.config import settings as cfg
+            logger.info(f"Config - ai_provider: {cfg.ai_provider}")
+            logger.info(f"Config - gemini_api_key set: {bool(cfg.gemini_api_key)} (len={len(cfg.gemini_api_key) if cfg.gemini_api_key else 0})")
+            logger.info(f"Config - gemini_model: {cfg.gemini_model}")
+            
             provider = get_ai_provider()
-            logger.info(f"AI provider created: {provider.provider_name} / {provider.model_name}")
+            logger.info(f"✅ AI provider created: {provider.provider_name} / {provider.model_name}")
         except Exception as e:
             import traceback
-            logger.error(f"Failed to create AI provider: {e}")
+            logger.error(f"❌ Failed to create AI provider: {e}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             logger.warning("⚠️ Continuing without AI analysis - all news will be marked as neutral")
+            logger.info("=" * 50)
+            logger.info("📝 STEP: Saving News WITHOUT AI Analysis")
+            logger.info("=" * 50)
             # 没有 AI，仍然保存新闻但不分析
             async with async_session_maker() as db:
                 for raw_create, news_create in normalized_items:
@@ -268,7 +279,11 @@ class Pipeline:
             return digest_items
         
         # 有 AI，进行分析
-        logger.info(f"🚀 Starting AI analysis for {len(normalized_items)} items with {provider.provider_name}")
+        logger.info("=" * 50)
+        logger.info("🚀 STEP: Starting AI Analysis (WITH AI)")
+        logger.info("=" * 50)
+        logger.info(f"Provider: {provider.provider_name} / {provider.model_name}")
+        logger.info(f"Items to analyze: {len(normalized_items)}")
         analyzed_count = 0
         skipped_count = 0
         
