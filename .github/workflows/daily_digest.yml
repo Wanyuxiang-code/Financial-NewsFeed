@@ -71,6 +71,7 @@ jobs:
             exit 1
           else
             echo "✅ GEMINI_API_KEY is set (length: ${#GEMINI_API_KEY})"
+            echo "   Key prefix: ${GEMINI_API_KEY:0:8}..."
           fi
           if [ -z "$FINNHUB_API_KEY" ]; then
             echo "⚠️ WARNING: FINNHUB_API_KEY is empty"
@@ -78,25 +79,77 @@ jobs:
             echo "✅ FINNHUB_API_KEY is set (length: ${#FINNHUB_API_KEY})"
           fi
 
+      - name: Test Gemini API
+        run: |
+          cd backend
+          echo "=== Testing Gemini API Connection ==="
+          python -c "
+          import os
+          api_key = os.environ.get('GEMINI_API_KEY', '')
+          print(f'API Key from env: {len(api_key)} chars')
+          print(f'Key prefix: {api_key[:8]}...' if api_key else 'No key')
+          
+          if api_key:
+              try:
+                  from google import genai
+                  from google.genai import types
+                  client = genai.Client(api_key=api_key)
+                  response = client.models.generate_content(
+                      model='gemini-2.0-flash',
+                      contents='Say hello in one word.',
+                      config=types.GenerateContentConfig(max_output_tokens=10)
+                  )
+                  print(f'✅ Gemini API test SUCCESS: {response.text}')
+              except Exception as e:
+                  print(f'❌ Gemini API test FAILED: {type(e).__name__}: {e}')
+                  import traceback
+                  traceback.print_exc()
+          else:
+              print('❌ No API key available for testing')
+          "
+
       - name: Run daily digest pipeline
         run: |
           cd backend
           echo "=== Environment Check ==="
           python -c "
+          import os
           from app.config import settings
           print(f'AI Provider: {settings.ai_provider}')
           print(f'Gemini Model: {settings.gemini_model}')
-          print(f'Gemini API Key set: {bool(settings.gemini_api_key)}')
-          print(f'Gemini API Key length: {len(settings.gemini_api_key) if settings.gemini_api_key else 0}')
+          print(f'Gemini API Key from settings: {bool(settings.gemini_api_key)}')
+          print(f'Gemini API Key length from settings: {len(settings.gemini_api_key) if settings.gemini_api_key else 0}')
+          print(f'Gemini API Key from env: {len(os.environ.get(\"GEMINI_API_KEY\", \"\"))}')
           print(f'Outputs: {settings.outputs}')
+          print(f'Prompts dir: {settings.prompts_dir}')
+          print(f'Watchlist path: {settings.watchlist_path}')
+          
+          # Check .env file
+          import pathlib
+          env_file = pathlib.Path('.env')
+          if env_file.exists():
+              content = env_file.read_text()
+              lines = content.strip().split('\n')
+              print(f'.env file exists with {len(lines)} lines')
+              for line in lines:
+                  if '=' in line:
+                      key = line.split('=')[0]
+                      val = line.split('=', 1)[1] if len(line.split('=', 1)) > 1 else ''
+                      print(f'  {key}: {len(val)} chars')
+          else:
+              print('.env file not found!')
           "
           echo ""
           echo "=== Running pipeline ==="
           python -m app.cli --hours 24 --limit 5 --debug 2>&1 | tee pipeline.log
           echo ""
           echo "=== Pipeline completed ==="
-          echo "Analysis results:"
-          grep -E "(Analysis|success|failed|bullish|bearish|COMPLETED|KeyError|Error|AI provider|GeminiProvider)" pipeline.log || echo "No matching patterns found"
+          echo ""
+          echo "=== Key log lines ==="
+          grep -E "(AI provider|GeminiProvider|Starting AI|Analysis|success|failed|bullish|bearish|COMPLETED|Error|❌|✅|🚀)" pipeline.log || echo "No matching patterns found"
+          echo ""
+          echo "=== Stats summary ==="
+          grep -E "(Analyzed|Collected|Delivered)" pipeline.log | tail -20 || echo "No stats found"
 
       - name: Upload digest as artifact
         uses: actions/upload-artifact@v4
