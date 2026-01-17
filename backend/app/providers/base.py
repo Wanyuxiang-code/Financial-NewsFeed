@@ -103,9 +103,11 @@ No markdown, no extra text. JSON only."""
         return self.prompt_template.format(
             tickers=tickers_str,
             title=news.title,
+            news_title=news.title,  # 兼容新模板
             source=news.source,
             published_at=published_str,
             content=news.summary or "(No summary available)",
+            news_content=news.summary or "(No summary available)",  # 兼容新模板
             thesis=thesis or "(No specific investment thesis provided)"
         )
     
