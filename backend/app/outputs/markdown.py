@@ -284,8 +284,6 @@ class MarkdownOutput(BaseOutput):
         
         # AI 汇总卡片
         if summary:
-            lines.append("<blockquote>")
-            lines.append("")
             lines.append(f"**🤖 AI Daily Analysis**")
             lines.append("")
             lines.append(f"| | |")
@@ -327,9 +325,6 @@ class MarkdownOutput(BaseOutput):
                 for risk in summary.risk_alerts[:2]:
                     lines.append(f"- {risk}")
                 lines.append("")
-            
-            lines.append("</blockquote>")
-            lines.append("")
         
         # 新闻列表
         lines.append(f"**Today's News ({len(items)} items):**")
